@@ -4,14 +4,17 @@ const jwt = require("jsonwebtoken")
 
 async function registerUserHandler(req,res) {
     try {
+        console.log('Register request body:', req.body);
         const {name, email, password} = req.body;
         
         if (!name || !email || !password) {
+            console.log('Missing fields - name:', name, 'email:', email, 'password:', password ? 'present' : 'missing');
             return res.status(400).json({ message: "All fields are required" });
         }
         
         const existingUser = await Users.findOne({email});
         if(existingUser){
+            console.log('Email already registered:', email);
             return res.status(400).json({"message": "email already registered"});
         }
 
