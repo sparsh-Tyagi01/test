@@ -6,6 +6,10 @@ async function registerUserHandler(req,res) {
     try {
         const {name, email, password} = req.body;
         
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+        
         const existingUser = await Users.findOne({email});
         if(existingUser){
             return res.status(400).json({"message": "email already registered"});
@@ -26,7 +30,13 @@ async function registerUserHandler(req,res) {
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: "1d"});
 
-        res.status(201).json({token, user});
+        const userResponse = {
+            _id: user._id,
+            name: user.name,
+            email: user.email
+        };
+
+        res.status(201).json({token, user: userResponse});
     } catch (error) {
         console.error('Registeration Error:', error);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
@@ -36,6 +46,10 @@ async function registerUserHandler(req,res) {
 async function loginUserHandler(req,res) {
     try {
         const {email, password} = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
 
         const user = await Users.findOne({ email });
 
@@ -55,7 +69,13 @@ async function loginUserHandler(req,res) {
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: "1d"});
 
-        res.status(200).json({token, user});
+        const userResponse = {
+            _id: user._id,
+            name: user.name,
+            email: user.email
+        };
+
+        res.status(200).json({token, user: userResponse});
     } catch (error) {
         console.error('Login Error:', error);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });

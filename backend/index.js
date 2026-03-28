@@ -15,8 +15,12 @@ connectMongoDb(process.env.MONGO_URI);
 
 const app = express();
 
+const allowedOrigins = process.env.BASE_URL 
+  ? process.env.BASE_URL.split(',').map(origin => origin.trim())
+  : "*";
+
 app.use(cors({
-  origin: process.env.BASE_URL || "*",
+  origin: allowedOrigins,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
   credentials: true
 }));
