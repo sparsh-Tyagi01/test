@@ -1,27 +1,24 @@
-const Users = require("../models/user")
+const User = require("../models/user")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 async function registerUserHandler(req,res) {
     try {
-        console.log('Register request body:', req.body);
         const {name, email, password} = req.body;
         
         if (!name || !email || !password) {
-            console.log('Missing fields - name:', name, 'email:', email, 'password:', password ? 'present' : 'missing');
             return res.status(400).json({ message: "All fields are required" });
         }
         
-        const existingUser = await Users.findOne({email});
+        const existingUser = await User.findOne({email});
         if(existingUser){
-            console.log('Email already registered:', email);
             return res.status(400).json({"message": "email already registered"});
         }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = await Users.create({
+        const user = await User.create({
             name,
             email,
             password: hashedPassword
@@ -54,7 +51,7 @@ async function loginUserHandler(req,res) {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        const user = await Users.findOne({ email });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(400).json({ message: "User not found" });
